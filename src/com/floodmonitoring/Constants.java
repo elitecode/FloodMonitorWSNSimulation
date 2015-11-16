@@ -2,10 +2,10 @@ package com.floodmonitoring;
 
 public class Constants {
 	
-	public static int randomSeed = 0;
-	public static double RegularBatteryDecrease=0.01;
-	public static double RecieveBatteryDecrease=0.1;
-	public static double SendBatteryDecrease=0.3;
-	public static double NodeFaulterProb=.015;
+	public static int RANDOMSEED = 0;
+	public static double REGULARBATTERYDECREASE=0.01;
+	public static double RECEIVEBATTERYDECREASE=0.1;
+	public static double SENDBATTERYDECREASE=0.3;
+	public static double NODEFAULTERSEED=.015;
 
 }

@@ -4,21 +4,21 @@ import java.lang.Math;
 import java.util.Random;
 
 public class NodeUtility{
-    public static Random generate = new Random(Constants.randomSeed);
+    public static Random generate = new Random(Constants.RANDOMSEED);
     public static boolean checkNodeFault()
     {
         double random = generate.nextDouble();
-        if(random < Constants.randomSeed)
+        if(random < Constants.NODEFAULTERSEED)
             return true;
         return false;
     }
     public static double decreaseBattery(String Mode,double Battery){
         if(Mode.equals("SEND"))
-            Battery = Battery - Constants.SendBatteryDecrease;
-        else if(Mode.equals("RECIEVE"))
-            Battery = Battery - Constants.RecieveBatteryDecrease;
+            Battery = Battery - Constants.SENDBATTERYDECREASE;
+        else if(Mode.equals("RECEIVE"))
+            Battery = Battery - Constants.RECEIVEBATTERYDECREASE;
         else{
-            Battery = Battery - Constants.RegularBatteryDecrease;
+            Battery = Battery - Constants.REGULARBATTERYDECREASE;
         }
         if(Battery>=0)
             return Battery;
