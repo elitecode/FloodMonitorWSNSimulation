@@ -21,7 +21,7 @@ public class Node {
 //		locationLat , locationLong = fetchLocation();
 	}
 	
-	public void Execute(int time){
+	public void Execute(long time){
 		batteryLevel = NodeUtility.decreaseBattery("REGULAR", batteryLevel);
 		if(!data.isEmpty()) {
 			Packet packet = data.remove();

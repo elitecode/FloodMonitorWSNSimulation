@@ -4,14 +4,14 @@ public class Packet {
 
 	Node source;
 	Node destination;
-	int timestamp;
-	int travelTime;
+	long timestamp;
+	long travelTime;
 	
-	Packet(int time) {
+	Packet(long time) {
 		timestamp = time;
 	}
 	
-	public void updateTravelTime(int newTimestamp) {
+	public void updateTravelTime(long newTimestamp) {
 		travelTime = newTimestamp - timestamp;
 	}
 }
