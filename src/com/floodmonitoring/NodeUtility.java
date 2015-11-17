@@ -3,12 +3,12 @@ package com.floodmonitoring;
 import java.lang.Math;
 import java.util.Random;
 
-public class NodeUtitlity{
-    public static Random generate = New Random(Constants.randomSeed);
+public class NodeUtility{
+    public static Random generate = new Random(Constants.randomSeed);
     public static boolean checkNodeFault()
     {
         double random = generate.nextDouble();
-        if(random < Constants.randomseed)
+        if(random < Constants.randomSeed)
             return true;
         return false;
     }
