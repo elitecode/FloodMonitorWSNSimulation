@@ -24,4 +24,6 @@ public class NodeUtility{
             return Battery;
         return 0;
     }
+
+
 }
