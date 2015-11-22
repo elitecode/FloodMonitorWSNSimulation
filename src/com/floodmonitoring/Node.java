@@ -9,9 +9,10 @@ public class Node {
 	private double batteryLevel;
 	private int x;
 	private int y;
+	private String id;
 	private double sensedData;
 	private boolean status;
-	private Queue<Packet> data;
+	private Queue<Packet> packetQueue;
 	private List<Node> neighbours;
 	private MemoryQueue memory;
 	private boolean carrierLock;
@@ -22,10 +23,12 @@ public class Node {
 	Node(int x, int y){
 		this.x = x;
 		this.y = y;
-		data = new LinkedList<Packet>();
+		id = "("+x+","+y+")";
+		packetQueue = new LinkedList<Packet>();
 		batteryLevel =  100;
 		status = true;
 		gatherData = false;
+		memory = new MemoryQueue(Constants.MEMORY_SIZE);
 //		locationLat , locationLong = fetchLocation();
 	}
 	
@@ -40,13 +43,13 @@ public class Node {
 			
 			// Data generation check
 			
-			if(!data.isEmpty()) {
+			if(!packetQueue.isEmpty()) {
 				if(getCarrierLock()) {
-					sendPacket(data.remove(), time);
+					sendPacket(packetQueue.remove(), time);
 				}
 			}
 			if(batteryLevel<=0 || Utility.checkNodeFault()) {
-				nodeFailure();
+				nodeFailure(time);
 			}
 			return true;
 		}
@@ -57,21 +60,51 @@ public class Node {
 	public void sendPacket(Packet packet, long time) {
 		packet.updateTravelTime(time);
 		
+		switch(packet.getType()) {
+		case BROADCAST:
+			sendBroadcast(packet, time);
+			break;
+		case KHOPREQUEST:
+			break;
+		case KHOPRESPONSE:
+			break;
+		case PATHREQUEST:
+			break;
+		case STANDARD:
+			break;
+		default:
+			log("Invalid Packet", time);
+			break;
+		}
 		
 		memory.addPacket(packet);
 		batteryLevel = Utility.decreaseBattery("SEND", batteryLevel);
 		
 	}
 	
-	public void sendBroadcast() {
+	public void sendBroadcast(Packet packet, long time) {
+		boolean lock = true;
+		for(Node node : neighbours) {
+			lock = lock && node.canGetCarrierLock();
+		}
+		if(lock) {
+			for(Node node : neighbours) {
+				node.getCarrierLock();
+				log("Packet sent to "+node.id, time);
+				node.receivePacket(packet, time);
+			}
+		}
+		else {
+			packetQueue.add(packet);
+			resetCarrierLock();
+		}
+	}
+	
+	public void sendDirected(Packet packet, Node destination) {
 		
 	}
 	
-	public void sendDirected() {
-		
-	}
-	
-	public void receivePacket(Packet packet) {
+	public void receivePacket(Packet packet, long time) {
 		
 		// Check if packet is not in memory
 		
@@ -80,13 +113,18 @@ public class Node {
 		// if k-hop response packet, forward it using node list in packet
 		// If node failure packet, delete that node from neighbours
 		// If normal packet, add to queue
-		
-		data.add(packet);
+		if(!memory.inMemory(packet)) {
+			packetQueue.add(packet);
+			log("Received packet", time);
+		}
+		else {
+			log("Received packet already in memory", time);
+		}
 		batteryLevel = Utility.decreaseBattery("RECEIVE", batteryLevel);
 	}
 	
-	public void nodeFailure() {
-		log("Node Failure " + x + " " + y + " Battery: " + batteryLevel);
+	public void nodeFailure(long time) {
+		log("Node Failure " + x + " " + y + " Battery: " + batteryLevel, time);
 		status = false;
 	}
 	
@@ -94,7 +132,14 @@ public class Node {
 		gatherData = true;
 		timePeriod = Constants.DATA_GATHER_RATE;
 		nextDataGenerationTime = time + Utility.generate.nextLong()%timePeriod;
-		log("Flood Detected");
+		log("Flood Detected", time);
+		
+		Packet packet = new Packet(time, this, PacketType.BROADCAST);
+		packetQueue.add(packet);
+	}
+	
+	public boolean canGetCarrierLock() {
+		return !carrierLock;
 	}
 	
 	public boolean getCarrierLock() {
@@ -108,8 +153,8 @@ public class Node {
 		carrierLock = false;
 	}
 	
-	public void log(Object o) {
-		System.out.println(o);
+	public void log(Object o, long time) {
+		System.out.println("Time: "+time+" | Node "+id+": " + o);
 	}
 	// Routing Data & Neighbours
 }

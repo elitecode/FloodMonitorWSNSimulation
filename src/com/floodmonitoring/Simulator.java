@@ -7,18 +7,22 @@ public class Simulator {
 	private List<Node> nodeList;
 	private int gridDim;
 	private Sink sink;
+	
 	public void simulate(long T){
 		
-		long t = 0;
-		while( t<T ){
+		long currentTime = 0;
+		while( currentTime<T ){
 			int i = 0;
 			// SIMULATE
-			if( (t % Constants.FLOOD_TIME_RATE) == 0 )
-				simulateFlood(t);
+			if( (currentTime % Constants.FLOOD_TIME_RATE) == 0 )
+				simulateFlood(currentTime);
 			for( i=0; i<nodeList.size(); i++){
-				nodeList.get(i).Execute(t);				
+				nodeList.get(i).Execute(currentTime);				
 			}
-			t++;
+			for( i=0; i<nodeList.size(); i++){
+				nodeList.get(i).resetCarrierLock();				
+			}
+			currentTime++;
 		}
 	}
 
@@ -63,14 +67,14 @@ public class Simulator {
 		for ( i=1; i<=gridDim; i++ ){
 			for( j=1; j<=gridDim; j++ ){
 				ArrayList<Node> neighbourList = new ArrayList<Node>();
-				if( i<gridDim && j<gridDim )
-					neighbourList.add(nodeList.get(getIndex(i+1, j+1)));
-				if( i<gridDim && j>1 )
-					neighbourList.add(nodeList.get(getIndex(i+1, j-1)));
-				if( i>1 && j>1 )
-					neighbourList.add(nodeList.get(getIndex(i-1, j-1)));
-				if( i>1 && j<gridDim)
-					neighbourList.add(nodeList.get(getIndex(i-1, j+1)));
+				if( j<gridDim )
+					neighbourList.add(nodeList.get(getIndex(i, j+1)));
+				if( j>1 )
+					neighbourList.add(nodeList.get(getIndex(i, j-1)));
+				if( i>1 )
+					neighbourList.add(nodeList.get(getIndex(i-1, j)));
+				if( i<gridDim)
+					neighbourList.add(nodeList.get(getIndex(i+1, j)));
 				
 				if( (Math.abs(i-sinkPos)<=1) && (Math.abs(j-sinkPos)<=1))
 					neighbourList.add(sink);

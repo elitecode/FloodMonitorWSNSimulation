@@ -7,7 +7,7 @@ public class Sink extends Node {
 	}
 	
 	@Override
-	public void receivePacket(Packet packet){
+	public void receivePacket(Packet packet, long time){
 		
 	}
 	@Override
