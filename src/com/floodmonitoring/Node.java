@@ -13,7 +13,7 @@ public class Node {
 	private boolean status;
 	private Queue<Packet> data;
 	private List<Node> neighbours;
-	private List<Integer> packetMemory;
+	private MemoryQueue memory;
 	private boolean carrierLock;
 	private long nextDataGenerationTime;
 	private long timePeriod;
@@ -42,10 +42,7 @@ public class Node {
 			
 			if(!data.isEmpty()) {
 				if(getCarrierLock()) {
-					Packet packet = data.remove();
-					packet.updateTravelTime(time);
-					sendPacket(packet);
-					
+					sendPacket(data.remove(), time);
 				}
 			}
 			if(batteryLevel<=0 || Utility.checkNodeFault()) {
@@ -57,8 +54,20 @@ public class Node {
 			return false;
 	}
 	
-	public void sendPacket(Packet packet) {
+	public void sendPacket(Packet packet, long time) {
+		packet.updateTravelTime(time);
+		
+		
+		memory.addPacket(packet);
 		batteryLevel = Utility.decreaseBattery("SEND", batteryLevel);
+		
+	}
+	
+	public void sendBroadcast() {
+		
+	}
+	
+	public void sendDirected() {
 		
 	}
 	

@@ -15,7 +15,7 @@ public class Sink extends Node {
 		return true;
 	}
 	@Override
-	public void sendPacket(Packet packet){
+	public void sendPacket(Packet packet, long time){
 		
 	}
 
