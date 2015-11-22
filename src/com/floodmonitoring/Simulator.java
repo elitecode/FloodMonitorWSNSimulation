@@ -33,8 +33,8 @@ public class Simulator {
 				nodeList.add(node);				
 			}
 		}
-		setNeighbours();
 		sink = new Sink(gridDim/2, gridDim/2);
+		setNeighbours();
 	}
 	
 	private void simulateFlood(long t){
@@ -63,10 +63,14 @@ public class Simulator {
 		for ( i=1; i<=gridDim; i++ ){
 			for( j=1; j<=gridDim; j++ ){
 				ArrayList<Node> neighbourList = new ArrayList<Node>();
-				neighbourList.add(nodeList.get(getIndex(i+1, j+1)));
-				neighbourList.add(nodeList.get(getIndex(i+1, j-1)));
-				neighbourList.add(nodeList.get(getIndex(i-1, j-1)));
-				neighbourList.add(nodeList.get(getIndex(i-1, j+1)));
+				if( i<gridDim && j<gridDim )
+					neighbourList.add(nodeList.get(getIndex(i+1, j+1)));
+				if( i<gridDim && j>1 )
+					neighbourList.add(nodeList.get(getIndex(i+1, j-1)));
+				if( i>1 && j>1 )
+					neighbourList.add(nodeList.get(getIndex(i-1, j-1)));
+				if( i>1 && j<gridDim)
+					neighbourList.add(nodeList.get(getIndex(i-1, j+1)));
 				
 				if( (Math.abs(i-sinkPos)<=1) && (Math.abs(j-sinkPos)<=1))
 					neighbourList.add(sink);
