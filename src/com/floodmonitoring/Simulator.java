@@ -6,6 +6,7 @@ import java.util.List;
 public class Simulator {
 	private List<Node> nodeList;
 	private int gridDim;
+	private Sink sink;
 	public void simulate(long T){
 		
 		long t = 0;
@@ -31,7 +32,9 @@ public class Simulator {
 				Node node = new Node(i, j);
 				nodeList.add(node);				
 			}
-		}		
+		}
+		setNeighbours();
+		sink = new Sink(gridDim/2, gridDim/2);
 	}
 	
 	private void simulateFlood(long t){
@@ -54,6 +57,32 @@ public class Simulator {
 		}		
 	}
 	
+	private void setNeighbours(){
+		int  i, j;
+		int sinkPos = gridDim/2;
+		for ( i=1; i<=gridDim; i++ ){
+			for( j=1; j<=gridDim; j++ ){
+				ArrayList<Node> neighbourList = new ArrayList<Node>();
+				neighbourList.add(nodeList.get(getIndex(i+1, j+1)));
+				neighbourList.add(nodeList.get(getIndex(i+1, j-1)));
+				neighbourList.add(nodeList.get(getIndex(i-1, j-1)));
+				neighbourList.add(nodeList.get(getIndex(i-1, j+1)));
+				
+				if( (Math.abs(i-sinkPos)<=1) && (Math.abs(j-sinkPos)<=1))
+					neighbourList.add(sink);
+				
+				nodeList.get(getIndex(i, j)).setNeighbours(neighbourList);
+			}
+		}
+
+		ArrayList<Node> neighbourList = new ArrayList<Node>();
+		neighbourList.add(nodeList.get(getIndex(sinkPos+1, sinkPos+1)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos+1, sinkPos-1)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos-1, sinkPos-1)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos-1, sinkPos+1)));
+		sink.setNeighbours(neighbourList);
+		
+	}
 	private int getIndex(int x, int y){
 		return ((x-1)*gridDim + (y-1));
 	}
