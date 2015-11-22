@@ -11,7 +11,7 @@ public class Packet {
 	private long timestamp;
 	private long travelTime;
 	private long numberHops;
-	public  long packetId;
+	private long packetId;
 	Stack<Node> path;
 	PacketType type;
 	Packet(long time,Node mSource,PacketType mtype){
@@ -20,7 +20,24 @@ public class Packet {
 		packetId = Utility.getPacketId();
         previous = mSource;
 		type = mtype;
+		path = new Stack<Node>();
 	}
+	Packet(Packet packet){
+		this.source=packet.getSource();
+		this.previous=packet.getPrevious();
+		this.destination=packet.getDestination();
+		this.type=packet.getType();
+		this.timestamp=packet.getTimestamp();
+		this.packetId=packet.getPacketId();
+		this.numberHops=packet.getNumberHops();
+		this.travelTime=packet.getTravelTime();
+		this.path= (Stack<Node>) packet.getPath().clone();
+	}
+
+	private Stack<Node> getPath() {
+		return path;
+	}
+
 	public void updateTravelTime(long newTimestamp) {
 		travelTime = newTimestamp - timestamp;
 	}
@@ -41,8 +58,8 @@ public class Packet {
 		return path.isEmpty();
 	}
 
-	public void setDestination(Node mdestination){
-		destination = mdestination;
+	public void setDestination(Node mDestination){
+		destination = mDestination;
 	}
 	public void incrementHops(){
 		numberHops++;
@@ -59,6 +76,9 @@ public class Packet {
 	public Node getDestination(){
 		return destination;
 	}
+	private Node getSource() {
+		return source;
+	}
 	public long getTimestamp(){
 		return timestamp;
 	}
@@ -70,5 +90,31 @@ public class Packet {
 	}
 	public PacketType getType(){
 		return type;
+	}
+	public Packet getClone(){
+		Packet clone = new Packet(timestamp,source,type);
+		clone.setDestination(destination);
+		return null;
+	}
+	public void setSource(Node mSource){
+		source = mSource;
+	}
+	public void setPrevious(Node mPrevious){
+		previous = mPrevious;
+	}
+	public void setTimestamp(long mTimestamp){
+		timestamp = mTimestamp;
+	}
+	public void setTravelTime(long mTravelTime){
+		travelTime = mTravelTime;
+	}
+	public void setNumberHops(int mNumberhops){
+		numberHops = mNumberhops;
+	}
+	public void setPacketId(int mPacketId){
+		packetId = mPacketId;
+	}
+	public void setPath(Stack<Node> mPath){
+		path = mPath;
 	}
 }
