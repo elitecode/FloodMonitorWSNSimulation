@@ -11,13 +11,13 @@ public class Packet {
 	private long timestamp;
 	private long travelTime;
 	private long numberHops;
-	public static long packetId;
+	public  long packetId;
 	Stack<Node> path;
 	PacketType type;
 	Packet(long time,Node mSource,PacketType mtype){
 		source = mSource;
 		timestamp = time;
-		packetId++;
+		packetId = Utility.getPacketId();
         previous = mSource;
 		type = mtype;
 	}

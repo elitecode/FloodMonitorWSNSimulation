@@ -4,7 +4,8 @@ import java.lang.Math;
 import java.util.Random;
 
 public class Utility{
-    public static Random generate = new Random(Constants.RANDOMSEED);
+	private static long packetCount = 0;
+    public static Random generate = new Random(Constants.RANDOMSEED);    
     public static boolean checkNodeFault()
     {
         double random = generate.nextDouble();
@@ -24,6 +25,10 @@ public class Utility{
             return Battery;
         return 0;
     }
-
+    
+    public static long getPacketId(){
+    	packetCount++;
+    	return packetCount;
+    }
 
 }
