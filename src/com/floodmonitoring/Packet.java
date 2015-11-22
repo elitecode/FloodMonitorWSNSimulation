@@ -68,4 +68,7 @@ public class Packet {
 	public long getPacketId(){
 		return packetId;
 	}
+	public PacketType getType(){
+		return type;
+	}
 }
