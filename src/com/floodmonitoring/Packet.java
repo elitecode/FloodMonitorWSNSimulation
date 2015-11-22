@@ -5,19 +5,17 @@ import java.util.Stack;
 
 public class Packet {
 
-	Node source;
-	Node destination;
-    Node previous;
-	long timestamp;
-	long travelTime;
-	long numberHops;
+	private Node source;
+	private Node destination;
+    private Node previous;
+	private long timestamp;
+	private long travelTime;
+	private long numberHops;
 	public static long packetId;
 	Stack<Node> path;
-	public enum type{
-		KHOPRESPONSE,KHOPREQUEST,BROADCAST,PATHREQUEST,STANDARD;
-	}
-	Packet(long time,Node mSource,Node mDestination, String mtype){
-		source = mSource
+	PacketType type;
+	Packet(long time,Node mSource,PacketType mtype){
+		source = mSource;
 		timestamp = time;
 		packetId++;
         previous = mSource;
@@ -32,13 +30,42 @@ public class Packet {
 	}
 	public Node getNextInPath(){
 		if(!path.isEmpty())
-		return path.peek();
+			return path.peek();
+		return null;
 	}
 	public void removeFromPath(){
 		if(!path.isEmpty())
-		path.pop();
+			path.pop();
 	}
 	public boolean isPathEmpty(){
 		return path.isEmpty();
+	}
+
+	public void setDestination(Node mdestination){
+		destination = mdestination;
+	}
+	public void incrementHops(){
+		numberHops++;
+	}
+	public long getNumberHops(){
+		return numberHops;
+	}
+	public void updatePrevious(Node mPrevious){
+		previous = mPrevious;
+	}
+	public Node getPrevious(){
+		return previous;
+	}
+	public Node getDestination(){
+		return destination;
+	}
+	public long getTimestamp(){
+		return timestamp;
+	}
+	public long getTravelTime(){
+		return travelTime;
+	}
+	public long getPacketId(){
+		return packetId;
 	}
 }
