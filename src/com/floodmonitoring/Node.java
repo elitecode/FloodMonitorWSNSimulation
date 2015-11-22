@@ -36,18 +36,19 @@ public class Node {
 	public boolean Execute(long time){
 		
 		if(status) {
-			batteryLevel = NodeUtility.decreaseBattery("REGULAR", batteryLevel);
+			batteryLevel = Utility.decreaseBattery("REGULAR", batteryLevel);
 			
 			// Data generation check
 			
 			if(!data.isEmpty()) {
-				Packet packet = data.remove();
-				packet.updateTravelTime(time);
-				sendPacket(packet);
-				
-				// set packet to memory using id
+				if(getCarrierLock()) {
+					Packet packet = data.remove();
+					packet.updateTravelTime(time);
+					sendPacket(packet);
+					
+				}
 			}
-			if(batteryLevel<=0 || NodeUtility.checkNodeFault()) {
+			if(batteryLevel<=0 || Utility.checkNodeFault()) {
 				nodeFailure();
 			}
 			return true;
@@ -57,7 +58,7 @@ public class Node {
 	}
 	
 	public void sendPacket(Packet packet) {
-		batteryLevel = NodeUtility.decreaseBattery("SEND", batteryLevel);
+		batteryLevel = Utility.decreaseBattery("SEND", batteryLevel);
 		
 	}
 	
@@ -72,7 +73,7 @@ public class Node {
 		// If normal packet, add to queue
 		
 		data.add(packet);
-		batteryLevel = NodeUtility.decreaseBattery("RECEIVE", batteryLevel);
+		batteryLevel = Utility.decreaseBattery("RECEIVE", batteryLevel);
 	}
 	
 	public void nodeFailure() {
@@ -83,7 +84,7 @@ public class Node {
 	public void onFloodDetect(long time) {
 		gatherData = true;
 		timePeriod = Constants.DATA_GATHER_RATE;
-		nextDataGenerationTime = time + NodeUtility.generate.nextLong()%timePeriod;
+		nextDataGenerationTime = time + Utility.generate.nextLong()%timePeriod;
 		log("Flood Detected");
 	}
 	
