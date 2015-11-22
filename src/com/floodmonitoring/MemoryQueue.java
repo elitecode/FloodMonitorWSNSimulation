@@ -12,7 +12,7 @@ public class MemoryQueue {
     MemoryQueue(int mSize){
         memQueue = new ArrayBlockingQueue<Packet>(mSize);
     }
-    public void addPackets(Packet packet){
+    public void addPacket(Packet packet){
         if(memQueue.size()<5){
             memQueue.add(packet);
         }
