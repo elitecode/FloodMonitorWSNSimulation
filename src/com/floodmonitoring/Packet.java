@@ -52,7 +52,6 @@ public class Packet {
 		travelTime = newTimestamp - timestamp;
 	}
 	public void addToPath(Node node){
-		if(!path.isEmpty())
 		path.push(node);
 	}
 	public Node getNextInPath(){

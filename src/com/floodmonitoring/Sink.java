@@ -4,6 +4,7 @@ public class Sink extends Node {
 
 	Sink(int x, int y) {
 		super(x, y);
+		id = "Sink";
 	}
 	
 	@Override

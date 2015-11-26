@@ -26,6 +26,7 @@ public class Simulator {
 			for( i=0; i<nodeList.size(); i++){
 				nodeList.get(i).resetCarrierLock();				
 			}
+			sink.resetCarrierLock();
 			currentTime++;
 		}
 		
