@@ -47,7 +47,7 @@ public class Packet {
 	}
 	public Node getNextInPath(){
 		if(!path.isEmpty())
-			return path.peek();
+			return path.pop();
 		return null;
 	}
 	public void removeFromPath(){

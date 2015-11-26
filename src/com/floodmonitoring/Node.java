@@ -6,19 +6,20 @@ import java.util.Queue;
 
 public class Node {
 
-	private double batteryLevel;
-	private int x;
-	private int y;
-	private String id;
-	private double sensedData;
-	private boolean status;
-	private Queue<Packet> packetQueue;
-	private List<Node> neighbours;
-	private MemoryQueue memory;
-	private boolean carrierLock;
-	private long nextDataGenerationTime;
-	private long timePeriod;
-	private boolean gatherData;
+	protected double batteryLevel;
+	protected int x;
+	protected int y;
+	protected String id;
+	protected double sensedData;
+	protected boolean status;
+	protected Queue<Packet> packetQueue;
+	protected List<Node> neighbours;
+	protected MemoryQueue memory;
+	protected boolean carrierLock;
+	protected long nextDataGenerationTime;
+	protected long timePeriod;
+	protected boolean gatherData;
+	protected Node nextNodeToSink;
 	
 	Node(int x, int y){
 		this.x = x;
@@ -65,13 +66,16 @@ public class Node {
 			sendBroadcast(packet, time);
 			break;
 		case KHOPREQUEST:
+			sendBroadcast(packet, time);
 			break;
 		case KHOPRESPONSE:
+			sendDirected(packet, packet.getNextInPath(), time);
 			break;
 		case RREQ:
 			sendBroadcast(packet, time);
 			break;
 		case STANDARD:
+			sendDirected(packet, nextNodeToSink, time);
 			break;
 		default:
 			log("Invalid Packet", time);
