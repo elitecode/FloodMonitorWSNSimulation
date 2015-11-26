@@ -61,14 +61,15 @@ public class Node {
 		packet.updateTravelTime(time);
 		
 		switch(packet.getType()) {
-		case BROADCAST:
+		case RREP:
 			sendBroadcast(packet, time);
 			break;
 		case KHOPREQUEST:
 			break;
 		case KHOPRESPONSE:
 			break;
-		case PATHREQUEST:
+		case RREQ:
+			sendBroadcast(packet, time);
 			break;
 		case STANDARD:
 			break;
@@ -100,8 +101,19 @@ public class Node {
 		}
 	}
 	
-	public void sendDirected(Packet packet, Node destination) {
-		
+	public void sendDirected(Packet packet, Node destination, long time) {
+		boolean lock = true;
+		if(lock) {
+			for(Node node : neighbours) {
+				node.getCarrierLock();
+				log("Packet sent to "+node.id, time);
+				node.receivePacket(packet, time);
+			}
+		}
+		else {
+			packetQueue.add(packet);
+			resetCarrierLock();
+		}
 	}
 	
 	public void receivePacket(Packet packet, long time) {
@@ -134,7 +146,7 @@ public class Node {
 		nextDataGenerationTime = time + Utility.generate.nextLong()%timePeriod;
 		log("Flood Detected", time);
 		
-		Packet packet = new Packet(time, this, PacketType.BROADCAST);
+		Packet packet = new Packet(time, this, PacketType.RREP);
 		packetQueue.add(packet);
 	}
 	
