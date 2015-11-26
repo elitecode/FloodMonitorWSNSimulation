@@ -99,7 +99,6 @@ public class Node {
 		}
 		
 		if(success) {
-			memory.addPacket(packet);
 			batteryLevel = Utility.decreaseBattery("SEND", batteryLevel);
 		}
 		else {
@@ -158,6 +157,7 @@ public class Node {
 		// If normal packet, add to queue
 		if(!memory.inMemory(packet)) {
 			log("Received packet", time);
+			memory.addPacket(packet);
 			
 			switch(packet.getType()) {
 			case RREP:
