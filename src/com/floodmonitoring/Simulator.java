@@ -10,7 +10,11 @@ public class Simulator {
 	
 	public void simulate(long T){
 		
-		long currentTime = 0;
+		long currentTime = 1;
+		Packet p = new Packet(currentTime, sink, PacketType.RREP);
+		p.addToPath(sink);
+		sink.sendPacket(p, currentTime);
+		
 		while( currentTime<T ){
 			int i = 0;
 			// SIMULATE
@@ -23,6 +27,10 @@ public class Simulator {
 				nodeList.get(i).resetCarrierLock();				
 			}
 			currentTime++;
+		}
+		
+		for( int i=0; i<nodeList.size(); i++){
+			System.out.println(nodeList.get(i).getId() +" nearest neighbour "+ nodeList.get(i).getNextNodeTosink()) ;				
 		}
 	}
 

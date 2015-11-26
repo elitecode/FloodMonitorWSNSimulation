@@ -22,6 +22,15 @@ public class Node {
 	protected Node nextNodeToSink;
 	protected boolean pathToSinkAvailable;
 	
+	public String getNextNodeTosink(){
+		if(nextNodeToSink == null)
+			return "Not Assigned";
+		return nextNodeToSink.getId();		
+	}
+	
+	public String getId(){
+		return id;
+	}
 	Node(int x, int y){
 		this.x = x;
 		this.y = y;
