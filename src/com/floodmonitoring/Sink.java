@@ -25,6 +25,7 @@ public class Sink extends Node {
 				Packet responsePacket = new Packet(time, this, PacketType.RREP);
 				responsePacket.addToPath(this);
 				packetQueue.add(responsePacket);
+				memory.addPacket(responsePacket);
 				break;
 			case STANDARD:
 				//TODO: LOG STUFF and DELAYS
