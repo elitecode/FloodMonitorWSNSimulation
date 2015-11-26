@@ -20,6 +20,7 @@ public class Node {
 	protected long timePeriod;
 	protected boolean gatherData;
 	protected Node nextNodeToSink;
+	protected boolean pathToSinkAvailable;
 	
 	Node(int x, int y){
 		this.x = x;
@@ -30,6 +31,7 @@ public class Node {
 		status = true;
 		gatherData = false;
 		memory = new MemoryQueue(Constants.MEMORY_SIZE);
+		pathToSinkAvailable = false;
 //		locationLat , locationLong = fetchLocation();
 	}
 	
@@ -45,7 +47,7 @@ public class Node {
 			// Data generation check
 			
 			if(!packetQueue.isEmpty()) {
-				if(getCarrierLock()) {
+				if(canGetCarrierLock()) {
 					sendPacket(packetQueue.remove(), time);
 				}
 			}
@@ -61,34 +63,54 @@ public class Node {
 	public void sendPacket(Packet packet, long time) {
 		packet.updateTravelTime(time);
 		
+		boolean success = true;
+		getCarrierLock();
 		switch(packet.getType()) {
 		case RREP:
-			sendBroadcast(packet, time);
+			success = sendBroadcast(packet, time);
 			break;
 		case KHOPREQUEST:
-			sendBroadcast(packet, time);
+			success = sendBroadcast(packet, time);
 			break;
 		case KHOPRESPONSE:
-			sendDirected(packet, packet.getNextInPath(), time);
+			success = sendDirected(packet, packet.getNextInPath(), time);
 			break;
 		case RREQ:
-			sendBroadcast(packet, time);
+			success = sendBroadcast(packet, time);
 			break;
 		case STANDARD:
-			sendDirected(packet, nextNodeToSink, time);
+			if(pathToSinkAvailable) {
+				if(nextNodeToSink.getStatus()) {
+					success = sendDirected(packet, nextNodeToSink, time);
+					break;
+				}
+				else {
+					// TODO: generate RREQ
+					Packet rreqPacket = new Packet(time, this, PacketType.RREQ);
+					packetQueue.add(rreqPacket);
+				}
+			}
+			packetQueue.add(packet);
+			success = false;
 			break;
 		default:
 			log("Invalid Packet", time);
 			break;
 		}
 		
-		memory.addPacket(packet);
-		batteryLevel = Utility.decreaseBattery("SEND", batteryLevel);
-		
+		if(success) {
+			memory.addPacket(packet);
+			batteryLevel = Utility.decreaseBattery("SEND", batteryLevel);
+		}
+		else {
+			resetCarrierLock();
+		}
 	}
 	
-	public void sendBroadcast(Packet packet, long time) {
+	public boolean sendBroadcast(Packet packet, long time) {
 		boolean lock = true;
+		
+		// TODO: check for failure nodes
 		for(Node node : neighbours) {
 			lock = lock && node.canGetCarrierLock();
 		}
@@ -96,16 +118,19 @@ public class Node {
 			for(Node node : neighbours) {
 				node.getCarrierLock();
 				log("Packet sent to "+node.id, time);
-				node.receivePacket(packet, time);
+				node.receivePacket(new Packet(packet), time);
 			}
+			return true;
 		}
 		else {
 			packetQueue.add(packet);
-			resetCarrierLock();
+			return false;
 		}
 	}
 	
-	public void sendDirected(Packet packet, Node destination, long time) {
+	public boolean sendDirected(Packet packet, Node destination, long time) {
+		
+		// TODO: Correct the code
 		boolean lock = true;
 		if(lock) {
 			for(Node node : neighbours) {
@@ -113,10 +138,12 @@ public class Node {
 				log("Packet sent to "+node.id, time);
 				node.receivePacket(packet, time);
 			}
+			return true;
 		}
 		else {
 			packetQueue.add(packet);
 			resetCarrierLock();
+			return false;
 		}
 	}
 	
@@ -130,8 +157,34 @@ public class Node {
 		// If node failure packet, delete that node from neighbours
 		// If normal packet, add to queue
 		if(!memory.inMemory(packet)) {
-			packetQueue.add(packet);
 			log("Received packet", time);
+			
+			switch(packet.getType()) {
+			case RREP:
+				pathToSinkAvailable = true;
+				nextNodeToSink = packet.getNextInPath();
+				packet.addToPath(this);
+				packet.incrementHops();
+				packetQueue.add(packet);
+				break;
+			case KHOPREQUEST:
+				packetQueue.add(packet);
+				break;
+			case KHOPRESPONSE:
+				packetQueue.add(packet);
+				break;
+			case RREQ:
+				packet.incrementHops();
+				packetQueue.add(packet);
+				break;
+			case STANDARD:
+				packetQueue.add(packet);
+				break;
+			default:
+				log("Invalid Packet", time);
+				break;
+			}
+			
 		}
 		else {
 			log("Received packet already in memory", time);
@@ -152,6 +205,10 @@ public class Node {
 		
 		Packet packet = new Packet(time, this, PacketType.RREP);
 		packetQueue.add(packet);
+	}
+	
+	public boolean getStatus() {
+		return status;
 	}
 	
 	public boolean canGetCarrierLock() {

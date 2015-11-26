@@ -34,6 +34,16 @@ public class Packet {
 		this.path= (Stack<Node>) packet.getPath().clone();
 	}
 
+	public boolean equals(Object other) {
+		if((other == null) || (getClass() != other.getClass())){
+	        return false;
+	    }
+		Packet packet = (Packet) other;
+		if(this.packetId == packet.packetId)
+			return true;
+		return false;
+	}
+	
 	private Stack<Node> getPath() {
 		return path;
 	}
