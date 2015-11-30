@@ -33,6 +33,9 @@ public class Simulator {
 		for( int i=0; i<nodeList.size(); i++){
 			System.out.println(nodeList.get(i).getId() +" nearest neighbour "+ nodeList.get(i).getNextNodeTosink()) ;				
 		}
+		
+		System.out.println("Avg Delay: " + sink.getAverageDelay());
+		System.out.println("Total Packets: " + sink.getTotalDataPacketsReceived());
 	}
 
 	Simulator(int N) {
@@ -55,12 +58,12 @@ public class Simulator {
 		
 		if( randomNumber < Constants.FLOOD_PROBABILITY ){
 
-			double xFlood = gridDim*Utility.generate.nextDouble();
-			double yFlood = gridDim*Utility.generate.nextDouble();
+			double xFlood = (gridDim-1)*Utility.generate.nextDouble();
+			double yFlood = (gridDim-1)*Utility.generate.nextDouble();
 			
 			int x1 = (int)xFlood + 1;
 			int y1 = (int)yFlood + 1;
-			
+						
 			nodeList.get(getIndex(x1,y1)).onFloodDetect(t);
 			nodeList.get(getIndex(x1,y1+1)).onFloodDetect(t);
 			nodeList.get(getIndex(x1+1,y1)).onFloodDetect(t);
@@ -93,10 +96,11 @@ public class Simulator {
 		}
 
 		ArrayList<Node> neighbourList = new ArrayList<Node>();
-		neighbourList.add(nodeList.get(getIndex(sinkPos+1, sinkPos+1)));
-		neighbourList.add(nodeList.get(getIndex(sinkPos+1, sinkPos-1)));
-		neighbourList.add(nodeList.get(getIndex(sinkPos-1, sinkPos-1)));
-		neighbourList.add(nodeList.get(getIndex(sinkPos-1, sinkPos+1)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos+1, sinkPos)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos-1, sinkPos)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos, sinkPos-1)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos, sinkPos+1)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos, sinkPos)));
 		sink.setNeighbours(neighbourList);
 		
 	}

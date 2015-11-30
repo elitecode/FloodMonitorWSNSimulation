@@ -5,6 +5,7 @@ import sun.rmi.runtime.Log;
 public class Driver {
 
 	public static void main(String[] args) {
+
 		Simulator simulator = new Simulator(16);
 		simulator.simulate(100);
 		double[] floodProb = {.2,.4,.6,.8};

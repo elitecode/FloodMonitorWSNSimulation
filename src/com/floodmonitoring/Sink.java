@@ -2,9 +2,14 @@ package com.floodmonitoring;
 
 public class Sink extends Node {
 
+	private long dataPackets;
+	private long totalDelay;
 	Sink(int x, int y) {
 		super(x, y);
 		id = "Sink";
+		dataPackets = 0;
+		totalDelay = 0;
+		
 	}
 	
 	@Override
@@ -27,8 +32,10 @@ public class Sink extends Node {
 				packetQueue.add(responsePacket);
 				memory.addPacket(responsePacket);
 				break;
-			case STANDARD:
+			case STANDARD:				
 				//TODO: LOG STUFF and DELAYS
+				dataPackets++;
+				totalDelay = totalDelay + packet.getTravelTime();
 				break;
 			default: //log packet
 		}
@@ -55,4 +62,10 @@ public class Sink extends Node {
 				
 	}
 
+	public long getTotalDataPacketsReceived(){
+		return dataPackets;
+	}
+	public double getAverageDelay(){
+		return (double)totalDelay/(double)dataPackets;
+	}
 }
