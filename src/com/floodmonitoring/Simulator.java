@@ -58,8 +58,11 @@ public class Simulator {
 			double xFlood = gridDim*Utility.generate.nextDouble();
 			double yFlood = gridDim*Utility.generate.nextDouble();
 			
-			int x1 = (int)xFlood + 1;
-			int y1 = (int)yFlood + 1;
+			int x1 = (int)xFlood ;
+			int y1 = (int)yFlood ;
+			
+			System.out.println(xFlood);
+			System.out.println(xFlood);
 			
 			nodeList.get(getIndex(x1,y1)).onFloodDetect(t);
 			nodeList.get(getIndex(x1,y1+1)).onFloodDetect(t);
@@ -93,10 +96,11 @@ public class Simulator {
 		}
 
 		ArrayList<Node> neighbourList = new ArrayList<Node>();
-		neighbourList.add(nodeList.get(getIndex(sinkPos+1, sinkPos+1)));
-		neighbourList.add(nodeList.get(getIndex(sinkPos+1, sinkPos-1)));
-		neighbourList.add(nodeList.get(getIndex(sinkPos-1, sinkPos-1)));
-		neighbourList.add(nodeList.get(getIndex(sinkPos-1, sinkPos+1)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos+1, sinkPos)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos-1, sinkPos)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos, sinkPos-1)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos, sinkPos+1)));
+		neighbourList.add(nodeList.get(getIndex(sinkPos, sinkPos)));
 		sink.setNeighbours(neighbourList);
 		
 	}
