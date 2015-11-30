@@ -90,7 +90,7 @@ public class Simulator {
 		int x1 = (int)xUserQuery + 1;
 		int y1 = (int)yUserQuery + 1;
 					
-		//nodeList.get(getIndex(x1,y1)).onKHopRequest(t);
+		nodeList.get(getIndex(x1,y1)).onKHopRequest(t);
 		
 	}
 	private void setNeighbours(){
