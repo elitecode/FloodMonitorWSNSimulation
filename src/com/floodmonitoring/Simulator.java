@@ -55,15 +55,12 @@ public class Simulator {
 		
 		if( randomNumber < Constants.FLOOD_PROBABILITY ){
 
-			double xFlood = gridDim*Utility.generate.nextDouble();
-			double yFlood = gridDim*Utility.generate.nextDouble();
+			double xFlood = (gridDim-1)*Utility.generate.nextDouble();
+			double yFlood = (gridDim-1)*Utility.generate.nextDouble();
 			
-			int x1 = (int)xFlood ;
-			int y1 = (int)yFlood ;
-			
-			System.out.println(xFlood);
-			System.out.println(xFlood);
-			
+			int x1 = (int)xFlood + 1;
+			int y1 = (int)yFlood + 1;
+						
 			nodeList.get(getIndex(x1,y1)).onFloodDetect(t);
 			nodeList.get(getIndex(x1,y1+1)).onFloodDetect(t);
 			nodeList.get(getIndex(x1+1,y1)).onFloodDetect(t);
