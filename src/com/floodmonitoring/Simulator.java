@@ -130,6 +130,12 @@ public class Simulator {
 	public long getTotalDataPacketsReceived(){
 		return totalDataPackets;
 	}
+	public double getKHopRequests(){
+		return totalKHopRequests;
+	}
+	public double getAverageKHopDelay(){
+		return (double)totalKHopDelay/totalKHopRequests;
+	}
 	public double getAverageDelay(){
 		return averageDelay;
 	}
