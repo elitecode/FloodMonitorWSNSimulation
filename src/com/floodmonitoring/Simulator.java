@@ -7,6 +7,10 @@ public class Simulator {
 	private List<Node> nodeList;
 	private int gridDim;
 	private Sink sink;
+	private long totalDataPackets;
+	private long totalKHopRequests;
+	private long totalKHopDelay;
+	private double averageDelay;
 	
 	public void simulate(long T){
 		
@@ -17,9 +21,13 @@ public class Simulator {
 		
 		while( currentTime<T ){
 			int i = 0;
+			long USER_QUERY_RATE = 500;
 			// SIMULATE
 			if( (currentTime % Constants.FLOOD_TIME_RATE) == 0 )
 				simulateFlood(currentTime);
+			if( (currentTime % USER_QUERY_RATE) == 0 )
+				userQuery(currentTime);
+
 			for( i=0; i<nodeList.size(); i++){
 				nodeList.get(i).Execute(currentTime);				
 			}
@@ -30,22 +38,25 @@ public class Simulator {
 			currentTime++;
 		}
 		
+		totalDataPackets = sink.getTotalDataPacketsReceived();
+		averageDelay = sink.getAverageDelay();
 		for( int i=0; i<nodeList.size(); i++){
 			System.out.println(nodeList.get(i).getId() +" nearest neighbour "+ nodeList.get(i).getNextNodeTosink()) ;				
 		}
-		
-		System.out.println("Avg Delay: " + sink.getAverageDelay());
-		System.out.println("Total Packets: " + sink.getTotalDataPacketsReceived());
 	}
 
 	Simulator(int N) {
 
 		nodeList = new ArrayList<Node>();
 		gridDim = (int) Math.sqrt(N);
+		totalDataPackets = 0;
+		totalKHopDelay = 0;
+		totalKHopRequests = 0;
+		averageDelay = 0.0;
 		int  i, j;
 		for ( i=1; i<=gridDim; i++ ){
 			for( j=1; j<=gridDim; j++ ){
-				Node node = new Node(i, j);
+				Node node = new Node(i, j, this);
 				nodeList.add(node);				
 			}
 		}
@@ -72,7 +83,16 @@ public class Simulator {
 			
 		}		
 	}
-	
+	private void userQuery(long t){
+		double xUserQuery = (gridDim-1)*Utility.generate.nextDouble();
+		double yUserQuery = (gridDim-1)*Utility.generate.nextDouble();
+		
+		int x1 = (int)xUserQuery + 1;
+		int y1 = (int)yUserQuery + 1;
+					
+		//nodeList.get(getIndex(x1,y1)).onKHopRequest(t);
+		
+	}
 	private void setNeighbours(){
 		int  i, j;
 		int sinkPos = gridDim/2;
@@ -107,4 +127,16 @@ public class Simulator {
 	private int getIndex(int x, int y){
 		return ((x-1)*gridDim + (y-1));
 	}
+	public long getTotalDataPacketsReceived(){
+		return totalDataPackets;
+	}
+	public double getAverageDelay(){
+		return averageDelay;
+	}
+	
+	public void onKHopResponse(long delay){
+		totalKHopRequests++;
+		totalKHopDelay += delay ;
+	}
+
 }
