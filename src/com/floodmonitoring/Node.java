@@ -3,6 +3,7 @@ package com.floodmonitoring;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
 
 public class Node {
 
@@ -23,6 +24,7 @@ public class Node {
 	protected boolean pathToSinkAvailable;
 	public int packetDrop;
 	protected Simulator simulator;
+	protected long lastKHopRequest;
 	
 	public String getNextNodeTosink(){
 		if(nextNodeToSink == null)
@@ -45,6 +47,7 @@ public class Node {
 		memory = new MemoryQueue(Constants.MEMORY_SIZE);
 		pathToSinkAvailable = false;
 		packetDrop = 0;
+		lastKHopRequest = 0;
 	}
 	
 	public void setNeighbours(List<Node> neighbours) {
@@ -90,9 +93,10 @@ public class Node {
 			success = sendBroadcast(packet, time);
 			break;
 		case KHOPRESPONSE:
-			success = sendDirected(packet, packet.getNextInPath(), time);
+			Node destination = packet.getNextInPath();
+			success = sendDirected(packet, destination, time);
 			if(!success) {
-				++packetDrop;
+				packet.addToPath(destination);
 			}
 			break;
 		case RREQ:
@@ -137,7 +141,7 @@ public class Node {
 		if(lock) {
 			for(Node node : neighbours) {
 				node.getCarrierLock();
-				log("Packet sent to "+node.id, time);
+				log("Packet #"+packet.getPacketId()+" sent to "+node.id, time);
 				packet.incrementHops();
 				packet.updateTravelTime(time);
 				node.receivePacket(new Packet(packet), time);
@@ -151,7 +155,7 @@ public class Node {
 	}
 	
 	public boolean sendDirected(Packet packet, Node destination, long time) {
-		
+
 		if(destination.canGetCarrierLock()) {
 			destination.getCarrierLock();
 			log("Packet #"+packet.getPacketId()+" directed to "+destination.id, time);
@@ -189,13 +193,14 @@ public class Node {
 			case KHOPREQUEST:
 				generateKHopResponse(packet, time);
 				if(packet.getNumberHops() < Constants.KHOP_DISTANCE) {
+					packet.addToPath(this);
 					packetQueue.add(packet);
 				}
 				break;
 			case KHOPRESPONSE:
-				if(packet.getDestination().getId() == this.getId()) {
-					log("KHop Response packet #"+packet.getPacketId()+"Received",time);
-					//Simulator.KHopResponse();
+				if(packet.getDestination().getId().equals(this.getId())) {
+					log("KHop Response packet #"+packet.getPacketId()+" received",time);
+					simulator.onKHopResponse(time - lastKHopRequest);
 				}
 				else {
 					packetQueue.add(packet);
@@ -240,6 +245,7 @@ public class Node {
 	}
 	
 	public void onKHopRequest(long time) {
+		lastKHopRequest = time;
 		Packet packet = new Packet(time, this, PacketType.KHOPREQUEST);
 		packet.addToPath(this);
 		packetQueue.add(packet);
@@ -249,7 +255,8 @@ public class Node {
 	
 	public void generateKHopResponse(Packet reqPacket, long time) {
 		Packet packet = new Packet(time, this, PacketType.KHOPRESPONSE);
-		packet.setPath(reqPacket.path);
+		packet.setPath((Stack<Node>)reqPacket.path.clone());
+		packet.setDestination(reqPacket.getSource());
 		packetQueue.add(packet);
 		log("KHop Response packet #"+packet.getPacketId()+" generated",time);
 	}

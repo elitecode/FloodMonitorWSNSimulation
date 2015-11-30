@@ -85,7 +85,7 @@ public class Packet {
 	public Node getDestination(){
 		return destination;
 	}
-	private Node getSource() {
+	public Node getSource() {
 		return source;
 	}
 	public long getTimestamp(){
