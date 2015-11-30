@@ -244,6 +244,7 @@ public class Node {
 		packet.addToPath(this);
 		packetQueue.add(packet);
 		batteryLevel = Utility.decreaseBattery("RECEIVE", batteryLevel);
+		log("KHop Request packet #"+packet.getPacketId()+" generated",time);
 	}
 	
 	public void generateKHopResponse(Packet reqPacket, long time) {
