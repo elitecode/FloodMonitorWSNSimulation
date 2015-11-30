@@ -1,13 +1,10 @@
 package com.floodmonitoring;
 
-import sun.rmi.runtime.Log;
-
 public class Driver {
 
 	public static void main(String[] args) {
 
-		Simulator simulator = new Simulator(16);
-		simulator.simulate(100);
+
 		double[] floodProb = {.2,.4,.6,.8};
 		int[] dataGather = {10,20,30,40};
 		int[] floodtime = {100,200,300,400};
@@ -20,11 +17,16 @@ public class Driver {
 						Constants.setDataGatherRate(dataGather[j]);
 						Constants.setFloodTimeRate(floodtime[k]);
 						Constants.setNODEFAULTERSEED(Nodefault[l]);
-						System.out.println("Flood Probability = "+floodProb[i]);
-						System.out.println("Data Gather rate = "+dataGather[j]);
-						System.out.println("Flood Time rate = "+floodtime[k]);
-						System.out.println("Node fault Probability = "+Nodefault[l]);
-						simulator.simulate(100);
+                        Simulator simulator = new Simulator(16);
+                        simulator.simulate(2000);
+                        System.out.println("Avg Delay = "+simulator.getAverageDelay());
+                        System.out.println("Avg khop Delay = "+simulator.getAverageKHopDelay());
+                        System.out.println("Total packets = "+simulator.getTotalDataPacketsReceived());
+                        System.out.println("Total KhopReq = "+simulator.getKHopRequests());
+                        System.out.println("Flood Probability = "+floodProb[i]);
+                        System.out.println("Data Gather rate = "+dataGather[j]);
+                        System.out.println("Flood Time rate = "+floodtime[k]);
+                        System.out.println("Node fault Probability = "+Nodefault[l]);
 					}
 				}
 			}
