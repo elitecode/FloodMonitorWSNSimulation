@@ -5,7 +5,7 @@ public class Sink extends Node {
 	private long dataPackets;
 	private long totalDelay;
 	Sink(int x, int y) {
-		super(x, y);
+		super(x, y, null);
 		id = "Sink";
 		dataPackets = 0;
 		totalDelay = 0;

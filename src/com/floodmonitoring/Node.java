@@ -22,6 +22,7 @@ public class Node {
 	protected Node nextNodeToSink;
 	protected boolean pathToSinkAvailable;
 	public int packetDrop;
+	protected Simulator simulator;
 	
 	public String getNextNodeTosink(){
 		if(nextNodeToSink == null)
@@ -32,7 +33,8 @@ public class Node {
 	public String getId(){
 		return id;
 	}
-	Node(int x, int y){
+	Node(int x, int y, Simulator simulator){
+		this.simulator = simulator;
 		this.x = x;
 		this.y = y;
 		id = "("+x+","+y+")";
