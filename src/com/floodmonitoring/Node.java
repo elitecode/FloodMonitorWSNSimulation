@@ -21,6 +21,7 @@ public class Node {
 	protected boolean gatherData;
 	protected Node nextNodeToSink;
 	protected boolean pathToSinkAvailable;
+	public int packetDrop;
 	
 	public String getNextNodeTosink(){
 		if(nextNodeToSink == null)
@@ -41,6 +42,7 @@ public class Node {
 		gatherData = false;
 		memory = new MemoryQueue(Constants.MEMORY_SIZE);
 		pathToSinkAvailable = false;
+		packetDrop = 0;
 	}
 	
 	public void setNeighbours(List<Node> neighbours) {
@@ -87,6 +89,9 @@ public class Node {
 			break;
 		case KHOPRESPONSE:
 			success = sendDirected(packet, packet.getNextInPath(), time);
+			if(!success) {
+				++packetDrop;
+			}
 			break;
 		case RREQ:
 			success = sendBroadcast(packet, time);
@@ -180,10 +185,19 @@ public class Node {
 				packetQueue.add(packet);
 				break;
 			case KHOPREQUEST:
-				packetQueue.add(packet);
+				generateKHopResponse(packet, time);
+				if(packet.getNumberHops() < Constants.KHOP_DISTANCE) {
+					packetQueue.add(packet);
+				}
 				break;
 			case KHOPRESPONSE:
-				packetQueue.add(packet);
+				if(packet.getDestination().getId() == this.getId()) {
+					log("KHop Response packet #"+packet.getPacketId()+"Received",time);
+					//Simulator.KHopResponse();
+				}
+				else {
+					packetQueue.add(packet);
+				}
 				break;
 			case RREQ:
 				packetQueue.add(packet);
@@ -221,6 +235,20 @@ public class Node {
 		timePeriod = Constants.DATA_GATHER_RATE;
 		nextDataGenerationTime = time;
 		log("Flood Detected", time);
+	}
+	
+	public void onKHopRequest(long time) {
+		Packet packet = new Packet(time, this, PacketType.KHOPREQUEST);
+		packet.addToPath(this);
+		packetQueue.add(packet);
+		batteryLevel = Utility.decreaseBattery("RECEIVE", batteryLevel);
+	}
+	
+	public void generateKHopResponse(Packet reqPacket, long time) {
+		Packet packet = new Packet(time, this, PacketType.KHOPRESPONSE);
+		packet.setPath(reqPacket.path);
+		packetQueue.add(packet);
+		log("KHop Response packet #"+packet.getPacketId()+" generated",time);
 	}
 	
 	public boolean getStatus() {

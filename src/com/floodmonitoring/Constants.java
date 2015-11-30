@@ -11,6 +11,7 @@ public class Constants {
 	public static long FLOOD_TIME_RATE =  100;
 	public static long DATA_GATHER_RATE = 20;
 	public static int MEMORY_SIZE = 5;
+	public static int KHOP_DISTANCE = 2;
 
 	public static void setRANDOMSEED(int RANDOMSEED) {
 		Constants.RANDOMSEED = RANDOMSEED;
