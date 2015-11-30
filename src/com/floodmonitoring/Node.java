@@ -211,9 +211,6 @@ public class Node {
 		timePeriod = Constants.DATA_GATHER_RATE;
 		nextDataGenerationTime = time + Utility.generate.nextLong()%timePeriod;
 		log("Flood Detected", time);
-		
-		Packet packet = new Packet(time, this, PacketType.RREP);
-		packetQueue.add(packet);
 	}
 	
 	public boolean getStatus() {
