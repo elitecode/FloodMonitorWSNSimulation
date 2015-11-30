@@ -41,7 +41,6 @@ public class Node {
 		gatherData = false;
 		memory = new MemoryQueue(Constants.MEMORY_SIZE);
 		pathToSinkAvailable = false;
-//		locationLat , locationLong = fetchLocation();
 	}
 	
 	public void setNeighbours(List<Node> neighbours) {
@@ -54,6 +53,11 @@ public class Node {
 			batteryLevel = Utility.decreaseBattery("REGULAR", batteryLevel);
 			
 			// Data generation check
+			if(gatherData) {
+				if(time == nextDataGenerationTime) {
+					generateData(time);
+				}
+			}
 			
 			if(!packetQueue.isEmpty()) {
 				if(canGetCarrierLock()) {
@@ -94,9 +98,10 @@ public class Node {
 					break;
 				}
 				else {
-					// TODO: generate RREQ
 					Packet rreqPacket = new Packet(time, this, PacketType.RREQ);
 					packetQueue.add(rreqPacket);
+					pathToSinkAvailable = false;
+					log("Generated RREQ",time);
 				}
 			}
 			packetQueue.add(packet);
@@ -126,6 +131,8 @@ public class Node {
 			for(Node node : neighbours) {
 				node.getCarrierLock();
 				log("Packet sent to "+node.id, time);
+				packet.incrementHops();
+				packet.updateTravelTime(time);
 				node.receivePacket(new Packet(packet), time);
 			}
 			return true;
@@ -138,19 +145,16 @@ public class Node {
 	
 	public boolean sendDirected(Packet packet, Node destination, long time) {
 		
-		// TODO: Correct the code
-		boolean lock = true;
-		if(lock) {
-			for(Node node : neighbours) {
-				node.getCarrierLock();
-				log("Packet sent to "+node.id, time);
-				node.receivePacket(packet, time);
-			}
+		if(destination.canGetCarrierLock()) {
+			destination.getCarrierLock();
+			log("Packet #"+packet.getPacketId()+" directed to "+destination.id, time);
+			packet.incrementHops();
+			packet.updateTravelTime(time);
+			destination.receivePacket(packet, time);
 			return true;
 		}
 		else {
 			packetQueue.add(packet);
-			resetCarrierLock();
 			return false;
 		}
 	}
@@ -173,7 +177,6 @@ public class Node {
 				pathToSinkAvailable = true;
 				nextNodeToSink = packet.getNextInPath();
 				packet.addToPath(this);
-				packet.incrementHops();
 				packetQueue.add(packet);
 				break;
 			case KHOPREQUEST:
@@ -183,7 +186,6 @@ public class Node {
 				packetQueue.add(packet);
 				break;
 			case RREQ:
-				packet.incrementHops();
 				packetQueue.add(packet);
 				break;
 			case STANDARD:
@@ -201,6 +203,14 @@ public class Node {
 		batteryLevel = Utility.decreaseBattery("RECEIVE", batteryLevel);
 	}
 	
+	public void generateData(long time) {
+		sensedData = Utility.generate.nextDouble();
+		nextDataGenerationTime = time + timePeriod + (Utility.generate.nextInt()%10)-5;
+		Packet packet = new Packet(time, this, PacketType.STANDARD);
+		packetQueue.add(packet);
+		log("Data packet #"+packet.getPacketId()+" generated",time);
+	}
+	
 	public void nodeFailure(long time) {
 		log("Node Failure " + x + " " + y + " Battery: " + batteryLevel, time);
 		status = false;
@@ -209,7 +219,7 @@ public class Node {
 	public void onFloodDetect(long time) {
 		gatherData = true;
 		timePeriod = Constants.DATA_GATHER_RATE;
-		nextDataGenerationTime = time + Utility.generate.nextLong()%timePeriod;
+		nextDataGenerationTime = time;
 		log("Flood Detected", time);
 	}
 	

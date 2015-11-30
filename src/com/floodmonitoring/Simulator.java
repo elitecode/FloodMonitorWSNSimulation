@@ -33,6 +33,9 @@ public class Simulator {
 		for( int i=0; i<nodeList.size(); i++){
 			System.out.println(nodeList.get(i).getId() +" nearest neighbour "+ nodeList.get(i).getNextNodeTosink()) ;				
 		}
+		
+		System.out.println("Avg Delay: " + sink.getAverageDelay());
+		System.out.println("Total Packets: " + sink.getTotalDataPacketsReceived());
 	}
 
 	Simulator(int N) {
